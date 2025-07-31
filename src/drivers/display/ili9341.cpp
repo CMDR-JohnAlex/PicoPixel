@@ -5,7 +5,7 @@
 
 #include "fonts/RobotoMono-SemiBold.h"
 
-ili9341::ili9341(spi_inst_t *spiPort, int spiClockFreqency, uint8_t gpioCS, uint8_t gpioRESET, uint8_t gpioDC, uint8_t gpioMOSI, uint8_t gpioSCK, uint8_t led, uint8_t gpioMISO, bool portrait)
+ili9341::ili9341(spi_inst_t *spiPort, int spiClockFreqency, DisplayGPIO displayGPIO, bool portrait)
 {
     m_IsPortrait = portrait;
     if (m_IsPortrait)
@@ -21,13 +21,13 @@ ili9341::ili9341(spi_inst_t *spiPort, int spiClockFreqency, uint8_t gpioCS, uint
 
     m_SpiPort = spiPort;
     m_SpiClockFreqency = spiClockFreqency;
-    m_GpioCS = gpioCS;
-    m_GpioRESET = gpioRESET;
-    m_GpioDC = gpioDC;
-    m_GpioMOSI = gpioMOSI;
-    m_GpioSCK = gpioSCK;
-    m_Led = led;
-    m_GpioMISO = gpioMISO;
+    m_GpioCS = displayGPIO.CS;
+    m_GpioRESET = displayGPIO.RESET;
+    m_GpioDC = displayGPIO.DC;
+    m_GpioMOSI = displayGPIO.SDI_MOSI;
+    m_GpioSCK = displayGPIO.SCK;
+    m_Led = displayGPIO.LED;
+    m_GpioMISO = displayGPIO.SDO_MISO;
 
     // Setup GPIO stuffs
     gpio_init(m_Led);
@@ -90,11 +90,15 @@ ili9341::ili9341(spi_inst_t *spiPort, int spiClockFreqency, uint8_t gpioCS, uint
     SetCommand(ILI9341_MADCTL);
     if (IsPortrait())
     {
-        CommandParameter(0b00011000); // BGR format (bit 3 = 1), flipped vertical refresh order
+        // 0b01001000: MY=0, MX=1, MV=0, BGR=1
+        // Portrait mode: Top-left origin, normal row/column order, BGR color order
+        CommandParameter(0b01001000);
     }
     else
     {
-        CommandParameter(0b00101000); // BGR format (bit 3 = 1), flipped "Row / Column Exchange"
+        // 0b00101000: MY=0, MX=0, MV=1, BGR=1
+        // Landscape mode: Row/column exchange, BGR color order
+        CommandParameter(0b00101000);
     }
 
     // TODO: Ability to customize pixel format. 18-bit would be cool...?
@@ -837,6 +841,26 @@ void ili9341::PixelTest()
     }
 }
 
+void ili9341::RectangleTest()
+{
+    Clear();
+
+    uint16_t maxWidth = GetWidth();
+    uint16_t maxHeight = GetHeight();
+    uint16_t rectWidth = (rand() % (maxWidth / 4)) + 20;    // 20 to 25% of screen width
+    uint16_t rectHeight = (rand() % (maxHeight / 4)) + 20;  // 20 to 25% of screen height
+    uint16_t rectX = rand() % (maxWidth - rectWidth);       // Ensure rect fits horizontally
+    uint16_t rectY = rand() % (maxHeight - rectHeight);     // Ensure rect fits vertically
+
+    DrawRectangle(
+        rectX,
+        rectY,
+        rectWidth,
+        rectHeight,
+        RGBto16bit(rand() % 256, rand() % 256, rand() % 256)
+    );
+}
+
 void ili9341::TextTest()
 {
     Clear();
@@ -896,11 +920,15 @@ void ili9341::Sleep()
     SetCommand(ILI9341_DISPOFF);        // Turn off display
     sleep_ms(10);                       // Required delay
     SetCommand(ILI9341_SLPIN);          // Enter sleep mode
+    sleep_ms(10);                       // Extra delay for sleep to take effect (possibly not needed)
 
     // Turn off backlight to save power
     pwm_set_gpio_level(m_Led, 0);       // Set LED to 0%
     uint sliceNum = pwm_gpio_to_slice_num(m_Led);
     pwm_set_enabled(sliceNum, false);   // Disable PWM slice
+    gpio_set_function(m_Led, GPIO_FUNC_SIO); // Set pin to GPIO
+    gpio_set_dir(m_Led, GPIO_OUT);
+    gpio_put(m_Led, 0);                 // Drive pin LOW to ensure backlight is off
 
     m_IsAsleep = true;
 }
@@ -919,7 +947,8 @@ void ili9341::Wake()
     SetCommand(ILI9341_DISPON);         // Display on
     sleep_ms(10);                       // Small delay for stability
 
-    // Re-enable backlight
+    // Restore backlight pin to PWM mode and set full brightness
+    gpio_set_function(m_Led, GPIO_FUNC_PWM); // Set pin back to PWM
     uint sliceNum = pwm_gpio_to_slice_num(m_Led);
     pwm_set_enabled(sliceNum, true);
     pwm_set_gpio_level(m_Led, 0xFFFF);  // Full brightness

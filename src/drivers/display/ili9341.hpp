@@ -14,6 +14,19 @@
 #include <cstdlib>
 #include "ili9341HardwareCommands.hpp"
 
+// TODO: Doxygen documentation
+// TODO: Add spi port and frequency
+struct DisplayGPIO
+{
+    int CS;
+    int RESET;
+    int DC;
+    int SDI_MOSI;
+    int SCK;
+    int LED;
+    int SDO_MISO;
+};
+
 /**
  * @brief ILI9341 TFT LCD Display Driver Class
  *
@@ -35,6 +48,11 @@
  * @todo Multi-font support
  * @todo Font size support
  * @todo Touchscreen support
+ * @todo Perhaps split driver stuff and the more rendering type stuff into seperate files.
+ *       drivers/display/ili9341.cpp for the low-level display functions, and graphics/renderer.cpp
+ *       the more high-level DrawRectangle() functions, etc.?
+ *       The driver should be very permissive: "Go ahead, call SetCS() or break things. We don't check".
+ *       Meanwhile, the graphics/renderer.cpp would be the one checking bounds and such.
  */
 class ili9341
 {
@@ -59,7 +77,7 @@ public:
      * @warning Ensure all GPIO pins are available and not used by other peripherals
      * @note The constructor will configure all pins and initialize the display immediately
      */
-    ili9341(spi_inst_t *spiPort, int spiClockFreqency, uint8_t gpioCS, uint8_t gpioRESET, uint8_t gpioDC, uint8_t gpioMOSI, uint8_t gpioSCK, uint8_t led, uint8_t gpioMISO, bool portrait = true);
+    ili9341(spi_inst_t *spiPort, int spiClockFreqency, DisplayGPIO displayGPIO, bool portrait = true);
 
     /**
      * @brief Destroy the ili9341 object
@@ -353,6 +371,15 @@ public:
     void PixelTest();
 
     /**
+     * @brief Display a random rectangle.
+     *
+     * Renders a random rectangle at a random position, with a random size, and a random color.
+     *
+     * @note For development and testing purposes only
+     */
+    void RectangleTest();
+
+    /**
      * @brief Display a text rendering test pattern
      *
      * Demonstrates text rendering capabilities including:
@@ -387,6 +414,9 @@ public:
 
     /**
      * @brief Wake display from sleep mode
+     *
+     * @warning Will wake to 100% brightness
+     * @todo Cache brightness, and return to cached brightness
      */
     void Wake();
 
