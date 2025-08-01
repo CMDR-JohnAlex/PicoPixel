@@ -41,7 +41,6 @@ endif()
 add_executable(PicoPixel
     src/main.cpp
     src/drivers/display/ili9341.cpp
-    src/drivers/display/fonts/RobotoMono-SemiBold.c
     src/firmware/boot.cpp
     src/firmware/menu.cpp
     src/utils/random.cpp

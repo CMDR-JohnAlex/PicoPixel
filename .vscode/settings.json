@@ -49,6 +49,7 @@
         "string_view": "cpp",
         "span": "cpp",
         "compare": "cpp",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "cstdio": "cpp"
     }
 }

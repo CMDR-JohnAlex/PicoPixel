@@ -5,8 +5,8 @@
 namespace PicoPixel
 {
     // Initializes hardware, and shows a splashscreen.
-    bool BootSequence(ili9341* display);
+    bool BootSequence(PicoPixel::Driver::Ili9341Data* ili9341Data);
 
     // Diagnostics and testing.
-    bool RunDiagnostics(ili9341* display);
+    bool RunDiagnostics(PicoPixel::Driver::Ili9341Data* ili9341Data);
 }
