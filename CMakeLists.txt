@@ -43,6 +43,7 @@ add_executable(PicoPixel
     src/drivers/display/ili9341.cpp
     src/firmware/boot.cpp
     src/firmware/menu.cpp
+    src/utils/color.cpp
     src/utils/random.cpp
 )
 

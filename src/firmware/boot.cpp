@@ -1,4 +1,5 @@
 #include "boot.hpp"
+#include "utils/color.hpp"
 #include "utils/random.hpp"
 #include <pico/stdlib.h>
 #include <pico/cyw43_arch.h> // Onboard LED
@@ -47,7 +48,7 @@ namespace PicoPixel
         // display->DrawText(text2, centerX, display->GetHeight() / 2 + display->GetFontHeight() + 4, display->RGBto16bit(255, 255, 255));
         uint16_t buffer[ili9341Data->Width * ili9341Data->Height];
         for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Driver::RGBto16bit(255, 0, 140);
+            buffer[i] = PicoPixel::Utils::RGBto16bit(255, 0, 140);
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
 
 #ifdef STARTUP_DELAY_MS
@@ -88,19 +89,19 @@ namespace PicoPixel
 
         // Red
         for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Driver::RGBto16bit(255, 0, 0);
+            buffer[i] = PicoPixel::Utils::RGBto16bit(255, 0, 0);
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
         sleep_ms(3000);
 
         // Green
         for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Driver::RGBto16bit(0, 255, 0);
+            buffer[i] = PicoPixel::Utils::RGBto16bit(0, 255, 0);
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
         sleep_ms(3000);
 
         // Blue
         for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Driver::RGBto16bit(0, 0, 255);
+            buffer[i] = PicoPixel::Utils::RGBto16bit(0, 0, 255);
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
         sleep_ms(3000);
 

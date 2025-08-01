@@ -54,9 +54,5 @@ namespace PicoPixel
         void SetOutWriting(Ili9341Data* display, const int startCol, const int endCol, const int startPage, const int endPage);
         void WriteData8bit(Ili9341Data* display, const uint8_t* buffer, int bytes);
         void WriteData16bit(Ili9341Data* display, const uint16_t* buffer, int count);
-
-        // TODO: Move to utils
-        uint16_t RGBto16bit(uint8_t r, uint8_t g, uint8_t b);
-        uint16_t RGBAto16bit(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     }
 }
