@@ -77,7 +77,10 @@ namespace PicoPixel
             // TODO: Ability to customize/set fps
             SetCommand(display, ILI9341_FRMCTR1);
             CommandParameter(display, 0b00000000); // Internal oscillator frequency division ratio (0)
+            //CommandParameter(display, 0b00011111); // 60 fps / 31 clocks per line
             CommandParameter(display, 0b00011011); // 70 fps / 27 clocks per line (default)
+            //CommandParameter(display, 0b00010101); // 90 fps / 21 clocks per line
+            //CommandParameter(display, 0b00010000); // 119 fps / 16 (broken)
 
             Wake(display);
             SetBrightnessPercent(display, 100.0f);
@@ -88,6 +91,33 @@ namespace PicoPixel
         void DeinitializeIli9341(Ili9341Data* display)
         {
             Sleep(display);
+        }
+
+        void CreateBuffer(Ili9341Data* display, Buffer* buffer)
+        {
+            if (buffer->IsInitialized)
+                free(buffer->Data);
+
+            size_t bufferSize = display->Width * display->Height * sizeof(uint16_t);
+            uint16_t* newBuffer = (uint16_t*)malloc(bufferSize);
+            if (!newBuffer)
+            {
+                printf("Failed to allocate framebuffer!\n");
+            }
+
+            buffer->Width = display->Width;
+            buffer->Height = display->Height;
+            buffer->Data = newBuffer;
+            buffer->IsInitialized = true;
+        }
+
+        void DestroyBuffer(Buffer *buffer)
+        {
+            free(buffer->Data);
+            buffer->Width = 0;
+            buffer->Height = 0;
+            buffer->Data = nullptr;
+            buffer->IsInitialized = false;
         }
 
         void SetOrientation(Ili9341Data* display, bool portrait)
@@ -193,6 +223,11 @@ namespace PicoPixel
             display->IsAsleep = false;
         }
 
+        void DrawBuffer(Ili9341Data *display, uint16_t x, uint16_t y, Buffer* buffer)
+        {
+            DrawBuffer(display, x, y, buffer->Width, buffer->Height, buffer->Data);
+        }
+
         void DrawBuffer(Ili9341Data* display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* buffer)
         {
             if (width == 0 || height == 0 || buffer == nullptr) return;
@@ -207,20 +242,11 @@ namespace PicoPixel
             SetCS(display, CS_DISABLE);
         }
 
-        void DisplayTest(Ili9341Data* display)
+        void DisplayTest(Ili9341Data* display, Buffer* buffer)
         {
-            size_t bufsize = display->Width * display->Height * sizeof(uint16_t);
-            uint16_t* buffer = (uint16_t*)malloc(bufsize);
-            if (!buffer)
-            {
-                printf("Failed to allocate framebuffer!\n");
-            }
-
-            for (int i = 0; i < display->Width * display->Height; i++)
-                buffer[i] = 0xFFFF;
-            DrawBuffer(display, 0, 0, display->Width, display->Height, buffer);
-
-            free(buffer);
+            for (int i = 0; i < buffer->Width * buffer->Height; i++)
+                buffer->Data[i] = 0xFFFF;
+            DrawBuffer(display, 0, 0, buffer->Width, buffer->Height, buffer->Data);
 
             // int width = GetWidth();
             // int height = GetHeight();

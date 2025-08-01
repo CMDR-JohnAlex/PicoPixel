@@ -46,10 +46,14 @@ namespace PicoPixel
         // textWidth = display->GetTextWidth(text2);
         // centerX = (display->GetWidth() - textWidth) / 2;
         // display->DrawText(text2, centerX, display->GetHeight() / 2 + display->GetFontHeight() + 4, display->RGBto16bit(255, 255, 255));
-        uint16_t buffer[ili9341Data->Width * ili9341Data->Height];
-        for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Utils::RGBto16bit(255, 0, 140);
-        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
+
+        // FIXME: We probably should have some global framebuffer... we shouldn't be managing one here
+        PicoPixel::Driver::Buffer buffer;
+        PicoPixel::Driver::CreateBuffer(ili9341Data, &buffer);
+
+        for (int i = 0; i < buffer.Width * buffer.Height; i++)
+            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(255, 0, 140);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
 
 #ifdef STARTUP_DELAY_MS
         sleep_ms(STARTUP_DELAY_MS);
@@ -71,6 +75,7 @@ namespace PicoPixel
         Utils::InitRand();
 
         sleep_ms(1500);
+        PicoPixel::Driver::DestroyBuffer(&buffer);
         return true;
     }
 
@@ -78,48 +83,41 @@ namespace PicoPixel
     {
         // TODO: Do whatever diagnostic checks we can. Until then, display tests for now!
 
-        // NOTE: You can EASILY overflow the stack with these buffers. (Hence why this is on the heap.)
-        size_t bufsize = ili9341Data->Width * ili9341Data->Height * sizeof(uint16_t);
-        uint16_t* buffer = (uint16_t*)malloc(bufsize);
-        if (!buffer)
-        {
-            printf("Failed to allocate framebuffer!\n");
-            return false;
-        }
+        // FIXME: We probably should have some global framebuffer... we shouldn't be managing one here
+        PicoPixel::Driver::Buffer buffer;
+        PicoPixel::Driver::CreateBuffer(ili9341Data, &buffer);
 
         // Red
-        for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Utils::RGBto16bit(255, 0, 0);
-        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
+        for (int i = 0; i < buffer.Width * buffer.Height; i++)
+            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(255, 0, 0);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
         sleep_ms(3000);
 
         // Green
-        for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Utils::RGBto16bit(0, 255, 0);
-        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
+        for (int i = 0; i < buffer.Width * buffer.Height; i++)
+            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(0, 255, 0);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
         sleep_ms(3000);
 
         // Blue
-        for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = PicoPixel::Utils::RGBto16bit(0, 0, 255);
-        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
+        for (int i = 0; i < buffer.Width * buffer.Height; i++)
+            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(0, 0, 255);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
         sleep_ms(3000);
 
         // White
-        for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = 0xFFFF;
-        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
+        for (int i = 0; i < buffer.Width * buffer.Height; i++)
+            buffer.Data[i] = 0xFFFF;
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
         sleep_ms(3000);
 
         // Black
-        for (int i = 0; i < ili9341Data->Width * ili9341Data->Height; i++)
-            buffer[i] = 0x0000;
-        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, ili9341Data->Width, ili9341Data->Height, buffer);
+        for (int i = 0; i < buffer.Width * buffer.Height; i++)
+            buffer.Data[i] = 0x0000;
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
         sleep_ms(3000);
 
-        free(buffer);
-
-        PicoPixel::Driver::DisplayTest(ili9341Data);
+        PicoPixel::Driver::DisplayTest(ili9341Data, &buffer);
         sleep_ms(3000);
         // PicoPixel::Driver::PixelTest(ili9341Data);
         // sleep_ms(1500);
@@ -133,6 +131,8 @@ namespace PicoPixel
         //     PicoPixel::Driver::RectangleTest(ili9341Data);
         //     sleep_ms(1000);
         // }
+
+        PicoPixel::Driver::DestroyBuffer(&buffer);
 
         return true; // TODO: Return false if any test fails
     }
