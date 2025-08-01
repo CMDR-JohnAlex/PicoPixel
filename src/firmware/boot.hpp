@@ -4,8 +4,8 @@
 
 namespace PicoPixel
 {
-    // Initializes hardware, display, and shows a splashscreen.
-    bool BootSequence(const DisplayGPIO& displayGPIO);
+    // Initializes hardware, and shows a splashscreen.
+    bool BootSequence(ili9341* display);
 
     // Diagnostics and testing.
     bool RunDiagnostics(ili9341* display);

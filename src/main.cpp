@@ -37,10 +37,6 @@ void ToggleGPIOLEDPin(bool toggle)
 
 int main()
 {
-    // old init
-
-    printf("Hello, world!\n");
-
     // Filesystem tests
     // {
     //     fs_init();
@@ -99,7 +95,9 @@ int main()
 
 
 
-    DisplayGPIO displayGPIO = {
+    Ili9341PinConfig ili9341PinConfig = {
+        spi1,
+        static_cast<int>(62.5 * MHz),
         18, // CS
         17, // RESET
         16, // DC
@@ -118,29 +116,19 @@ int main()
         int T_IRQ = 5;
     } touch_gpio;
 
-    // Main init! Do NOT create a display before this, or it breaks.
-    // FIXME: Need some way (singleton I guess...) to ensure that only one instance of the ili9341 class exists at a given time.
-    // FIXME: Need to make some static/global variable to ensure that boot sequence runs only ONCE.
-    PicoPixel::BootSequence(displayGPIO);
-
-
-    // Portrait mode display
+    // FIXME: Any initialization "printf"s will not be heard...
     ili9341* display = new ili9341(
-        spi1, 62.5 * MHz,
-        displayGPIO,
+        ili9341PinConfig,
         true
     );
-    PicoPixel::RunDiagnostics(display);
-    delete(display);
 
-
-    // Landscape mode display
-    display = new ili9341(
-        spi1, 62.5 * MHz,
-        displayGPIO,
-        false
-    );
+    PicoPixel::BootSequence(display);
     PicoPixel::RunDiagnostics(display);
+
+    display->SetOrientation(false);
+    PicoPixel::RunDiagnostics(display);
+
+    //PicoPixel::Menu();
 
 
     //while (true)

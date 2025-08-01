@@ -5,19 +5,10 @@
 
 namespace PicoPixel
 {
-    bool BootSequence(const DisplayGPIO& displayGPIO)
+    bool BootSequence(ili9341* display)
     {
         stdio_init_all();
-
-//#ifdef STARTUP_DELAY_MS
-//        sleep_ms(STARTUP_DELAY_MS);
-//#endif
-
-        ili9341* display = new ili9341(
-            spi1, 62.5 * MHz,
-            displayGPIO,
-            true
-        );
+        printf("Hello, World!");
 
         // TODO: Proper splashscreen/logo
         display->Clear(display->RGBto16bit(0, 0, 0));
@@ -31,7 +22,6 @@ namespace PicoPixel
         centerX = (display->GetWidth() - textWidth) / 2;
         display->DrawText(text2, centerX, display->GetHeight() / 2 + display->GetFontHeight() + 4, display->RGBto16bit(255, 255, 255));
 
-// TODO: Should this be here, or before the display?
 #ifdef STARTUP_DELAY_MS
         sleep_ms(STARTUP_DELAY_MS);
 #endif
@@ -47,8 +37,7 @@ namespace PicoPixel
 
         Utils::InitRand();
 
-        //sleep_ms(1500);
-        sleep_ms(3000);
+        sleep_ms(1500);
         return true;
     }
 

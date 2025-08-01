@@ -15,15 +15,54 @@
 #include "ili9341HardwareCommands.hpp"
 
 // TODO: Doxygen documentation
-// TODO: Add spi port and frequency
-struct DisplayGPIO
+/**
+ * @brief Pin and SPI configuration for ILI9341 display
+ */
+struct Ili9341PinConfig
 {
+    /**
+     * @brief Pointer to SPI peripheral instance (spi0 or spi1)
+     */
+    spi_inst_t *SpiPort;
+
+    /**
+     * @brief SPI clock frequency in Hz
+     */
+    int SpiClockFreqency;
+
+    /**
+     * @brief Chip Select (CS) pin number (active low)
+     */
     int CS;
+
+    /**
+     * @brief Hardware reset pin number (active low)
+     */
     int RESET;
+
+    /**
+     * @brief Data/Command selection pin (0=command, 1=data)
+     */
     int DC;
+
+    /**
+     * @brief Master Output Slave Input (MOSI/SDI) pin number
+     */
     int SDI_MOSI;
+
+    /**
+     * @brief Serial Clock (SCK) pin number
+     */
     int SCK;
+
+    /**
+     * @brief Backlight LED control pin (PWM capable)
+     */
     int LED;
+
+    /**
+     * @brief Master Input Slave Output (MISO/SDO) pin number
+     */
     int SDO_MISO;
 };
 
@@ -63,21 +102,13 @@ public:
      * Initializes the ILI9341 display with the specified SPI configuration and GPIO pins.
      * Performs hardware reset, gamma correction setup, and display initialization.
      *
-     * @param spiPort Pointer to SPI instance (spi0 or spi1)
-     * @param spiClockFreqency SPI clock frequency in Hz (recommended: 62.5MHz. The maximum.)
-     * @param gpioMISO Master Input Slave Output pin number
-     * @param gpioCS Chip Select pin number (active low)
-     * @param gpioSCK Serial Clock pin number
-     * @param gpioMOSI Master Output Slave Input pin number (data line)
-     * @param gpioRESET Hardware reset pin number (active low)
-     * @param gpioDC Data/Command selection pin (0=command, 1=data)
-     * @param led Backlight LED control pin (PWM capable)
+     * @param ili9341PinConfig Ili9341PinConfig struct of pin and spi configuration
      * @param portrait Display orientation (true=240x320, false=320x240)
      *
      * @warning Ensure all GPIO pins are available and not used by other peripherals
      * @note The constructor will configure all pins and initialize the display immediately
      */
-    ili9341(spi_inst_t *spiPort, int spiClockFreqency, DisplayGPIO displayGPIO, bool portrait = true);
+    ili9341(const Ili9341PinConfig& ili9341PinConfig, bool portrait = true);
 
     /**
      * @brief Destroy the ili9341 object
@@ -447,6 +478,13 @@ public:
      * @param percent Brightness percentage (0.0 to 100.0)
      */
     void SetBrightnessPercent(float percent);
+
+    /**
+     * @brief Set the display orientation
+     *
+     * @param portrait true for portrait mode (240x320), false for landscape (320x240)
+     */
+    void SetOrientation(bool portrait);
 
 protected:
     /**

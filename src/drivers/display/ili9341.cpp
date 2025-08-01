@@ -5,7 +5,7 @@
 
 #include "fonts/RobotoMono-SemiBold.h"
 
-ili9341::ili9341(spi_inst_t *spiPort, int spiClockFreqency, DisplayGPIO displayGPIO, bool portrait)
+ili9341::ili9341(const Ili9341PinConfig& ili9341PinConfig, bool portrait)
 {
     m_IsPortrait = portrait;
     if (m_IsPortrait)
@@ -19,15 +19,15 @@ ili9341::ili9341(spi_inst_t *spiPort, int spiClockFreqency, DisplayGPIO displayG
         m_Height = 240;
     }
 
-    m_SpiPort = spiPort;
-    m_SpiClockFreqency = spiClockFreqency;
-    m_GpioCS = displayGPIO.CS;
-    m_GpioRESET = displayGPIO.RESET;
-    m_GpioDC = displayGPIO.DC;
-    m_GpioMOSI = displayGPIO.SDI_MOSI;
-    m_GpioSCK = displayGPIO.SCK;
-    m_Led = displayGPIO.LED;
-    m_GpioMISO = displayGPIO.SDO_MISO;
+    m_SpiPort = ili9341PinConfig.SpiPort;
+    m_SpiClockFreqency = ili9341PinConfig.SpiClockFreqency;
+    m_GpioCS = ili9341PinConfig.CS;
+    m_GpioRESET = ili9341PinConfig.RESET;
+    m_GpioDC = ili9341PinConfig.DC;
+    m_GpioMOSI = ili9341PinConfig.SDI_MOSI;
+    m_GpioSCK = ili9341PinConfig.SCK;
+    m_Led = ili9341PinConfig.LED;
+    m_GpioMISO = ili9341PinConfig.SDO_MISO;
 
     // Setup GPIO stuffs
     gpio_init(m_Led);
@@ -426,10 +426,10 @@ void ili9341::DrawTriangleGradient(uint16_t x1, uint16_t y1, uint16_t color1,
         return;
     }
 
-    // Extract RGB components from 16-bit colors (fixed-point for speed)
-    int32_t r1 = ((color1 >> 11) & 0x1F) << 16; // Red 5-bit -> 21-bit fixed point
-    int32_t g1 = ((color1 >> 5) & 0x3F) << 16;  // Green 6-bit -> 22-bit fixed point
-    int32_t b1 = (color1 & 0x1F) << 16;         // Blue 5-bit -> 21-bit fixed point
+    // Extract RGB components from 16-bit colors
+    int32_t r1 = ((color1 >> 11) & 0x1F) << 16;
+    int32_t g1 = ((color1 >> 5) & 0x3F) << 16;
+    int32_t b1 = (color1 & 0x1F) << 16;
 
     int32_t r2 = ((color2 >> 11) & 0x1F) << 16;
     int32_t g2 = ((color2 >> 5) & 0x3F) << 16;
@@ -985,6 +985,37 @@ void ili9341::SetBrightnessPercent(float percent)
     uint16_t brightness = (uint16_t)(percent * 655.35f); // 65535 / 100 = 655.35
 
     SetBrightness(brightness);
+}
+
+void ili9341::SetOrientation(bool portrait)
+{
+    if (m_IsPortrait == portrait)
+        return;
+
+    m_IsPortrait = portrait;
+    if (m_IsPortrait)
+    {
+        m_Width = 240;
+        m_Height = 320;
+    }
+    else
+    {
+        m_Width = 320;
+        m_Height = 240;
+    }
+
+    EnsureSPI8Bit();
+    SetCommand(ILI9341_MADCTL);
+    if (m_IsPortrait)
+    {
+        // 0b01001000: MY=0, MX=1, MV=0, BGR=1
+        CommandParameter(0b01001000);
+    }
+    else
+    {
+        // 0b00101000: MY=0, MX=0, MV=1, BGR=1
+        CommandParameter(0b00101000);
+    }
 }
 
 inline void ili9341::EnsureSPI8Bit()
