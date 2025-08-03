@@ -80,7 +80,7 @@ namespace PicoPixel
             //CommandParameter(display, 0b00011111); // 60 fps / 31 clocks per line
             CommandParameter(display, 0b00011011); // 70 fps / 27 clocks per line (default)
             //CommandParameter(display, 0b00010101); // 90 fps / 21 clocks per line
-            //CommandParameter(display, 0b00010000); // 119 fps / 16 (broken)
+            //CommandParameter(display, 0b00010000); // 119 fps / 16 clocks per line (broken)
 
             Wake(display);
             SetBrightnessPercent(display, 100.0f);
@@ -240,54 +240,6 @@ namespace PicoPixel
             spi_write16_blocking(display->SpiPort, buffer, width * height);
 
             SetCS(display, CS_DISABLE);
-        }
-
-        void DisplayTest(Ili9341Data* display, Buffer* buffer)
-        {
-            for (int i = 0; i < buffer->Width * buffer->Height; i++)
-                buffer->Data[i] = 0xFFFF;
-            DrawBuffer(display, 0, 0, buffer->Width, buffer->Height, buffer->Data);
-
-            // int width = GetWidth();
-            // int height = GetHeight();
-
-            // // Draw corner rectangles
-            // DrawRectangle(0, 0, 50, 50, RGBto16bit(0, 0xff, 0));
-            // DrawRectangle(0, height - 50, 50, 50, RGBto16bit(0, 0, 0xff));
-            // DrawRectangle(width - 50, 0, 50, 50, RGBto16bit(0xff, 0, 0));
-            // DrawRectangle(width - 50, height - 50, 50, 50, RGBto16bit(0x84, 0x45, 0x13));
-            // DrawRectangle(width - 50, height - 50, 25, 25, RGBto16bit(0xff, 0x00, 0xff));
-
-            // int bar = (width - 100) / 4;
-
-            // for (int y = 0; y < height; y++)
-            // {
-            //     float p = (float)y / (float)height;
-            //     uint8_t c = p * 255.0f;
-
-            //     DrawHorizontalLine(50 + bar * 0, y, bar, RGBto16bit(c, 0, 0));
-            //     DrawHorizontalLine(50 + bar * 1, y, bar, RGBto16bit(0, c, 0));
-            //     DrawHorizontalLine(50 + bar * 2, y, bar, RGBto16bit(0, 0, c));
-
-            //     // HSV calculation
-            //     uint8_t r, g, b;
-            //     float hue = (1.0f - p) * 6.0f;
-            //     int sector = (int)hue;
-            //     float f = hue - sector;
-            //     sector = sector % 6;
-
-            //     switch(sector)
-            //     {
-            //         case 0: r = 255; g = f * 255; b = 0; break;
-            //         case 1: r = (1-f) * 255; g = 255; b = 0; break;
-            //         case 2: r = 0; g = 255; b = f * 255; break;
-            //         case 3: r = 0; g = (1-f) * 255; b = 255; break;
-            //         case 4: r = f * 255; g = 0; b = 255; break;
-            //         case 5: r = 255; g = 0; b = (1-f) * 255; break;
-            //         default: r = 255; g = 0; b = 0; break;
-            //     }
-            //     DrawHorizontalLine(50 + bar * 3, y, bar, RGBto16bit(r, g, b));
-            // }
         }
 
         void EnsureSPI8Bit(Ili9341Data* display)

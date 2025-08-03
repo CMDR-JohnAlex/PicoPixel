@@ -1,10 +1,12 @@
 #include "boot.hpp"
+#include "graphics/graphics.hpp"
 #include "utils/color.hpp"
 #include "utils/random.hpp"
 #include <pico/stdlib.h>
 #include <pico/cyw43_arch.h> // Onboard LED
 #include <hardware/clocks.h>
 #include <cstdlib>
+#include <cmath>
 
 namespace PicoPixel
 {
@@ -88,36 +90,86 @@ namespace PicoPixel
         PicoPixel::Driver::CreateBuffer(ili9341Data, &buffer);
 
         // Red
-        for (int i = 0; i < buffer.Width * buffer.Height; i++)
-            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(255, 0, 0);
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(255, 0, 0));
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
-        sleep_ms(3000);
+        sleep_ms(1500);
 
         // Green
-        for (int i = 0; i < buffer.Width * buffer.Height; i++)
-            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(0, 255, 0);
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 255, 0));
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
-        sleep_ms(3000);
+        sleep_ms(1500);
 
         // Blue
-        for (int i = 0; i < buffer.Width * buffer.Height; i++)
-            buffer.Data[i] = PicoPixel::Utils::RGBto16bit(0, 0, 255);
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 255));
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
-        sleep_ms(3000);
+        sleep_ms(1500);
 
         // White
-        for (int i = 0; i < buffer.Width * buffer.Height; i++)
-            buffer.Data[i] = 0xFFFF;
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(255, 255, 255));
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
-        sleep_ms(3000);
+        sleep_ms(1500);
 
         // Black
-        for (int i = 0; i < buffer.Width * buffer.Height; i++)
-            buffer.Data[i] = 0x0000;
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
-        sleep_ms(3000);
+        sleep_ms(1500);
 
-        PicoPixel::Driver::DisplayTest(ili9341Data, &buffer);
+        // Test DrawLine
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
+        PicoPixel::Graphics::DrawLine(&buffer, 0, 0, buffer.Width - 1, buffer.Height - 1, PicoPixel::Utils::RGBto16bit(255, 0, 0));
+        PicoPixel::Graphics::DrawLine(&buffer, 0, buffer.Height - 1, buffer.Width - 1, 0, PicoPixel::Utils::RGBto16bit(0, 255, 0));
+        PicoPixel::Graphics::DrawLine(&buffer, buffer.Width / 2, 0, buffer.Width / 2, buffer.Height - 1, PicoPixel::Utils::RGBto16bit(0, 0, 255));
+        PicoPixel::Graphics::DrawLine(&buffer, 0, buffer.Height / 2, buffer.Width - 1, buffer.Height / 2, PicoPixel::Utils::RGBto16bit(255, 255, 0));
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
+        sleep_ms(2000);
+
+        // Test DrawRectangle
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
+        PicoPixel::Graphics::DrawRectangle(&buffer, 10, 10, buffer.Width / 2, buffer.Height / 2, PicoPixel::Utils::RGBto16bit(255, 0, 0), false);
+        PicoPixel::Graphics::DrawRectangle(&buffer, buffer.Width / 2, buffer.Height / 2, buffer.Width / 2 - 10, buffer.Height / 2 - 10, PicoPixel::Utils::RGBto16bit(0, 255, 0), true);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
+        sleep_ms(2000);
+
+        // Test DrawCircle
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
+        PicoPixel::Graphics::DrawCircle(&buffer, buffer.Width / 2, buffer.Height / 2, buffer.Height / 3, PicoPixel::Utils::RGBto16bit(0, 0, 255), false);
+        PicoPixel::Graphics::DrawCircle(&buffer, buffer.Width / 2, buffer.Height / 2, buffer.Height / 4, PicoPixel::Utils::RGBto16bit(255, 0, 255), true);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
+        sleep_ms(2000);
+
+        // Test DrawTriangle
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
+        PicoPixel::Graphics::DrawTriangle(&buffer, 20, buffer.Height - 20, buffer.Width / 2, 20, buffer.Width - 20, buffer.Height - 20, PicoPixel::Utils::RGBto16bit(255, 255, 0), false);
+        PicoPixel::Graphics::DrawTriangle(&buffer, 40, buffer.Height - 40, buffer.Width / 2, 40, buffer.Width - 40, buffer.Height - 40, PicoPixel::Utils::RGBto16bit(0, 255, 255), true);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
+        sleep_ms(2000);
+
+        // Test DrawPolygon
+        PicoPixel::Graphics::FillBuffer(&buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
+        // Hexagon outline
+        uint16_t hexX[6], hexY[6];
+        for (int i = 0; i < 6; i++)
+        {
+            float angle = 2.0f * 3.1415926f * i / 6.0f;
+            hexX[i] = (uint16_t)(buffer.Width / 2.0f + (buffer.Height / 3.0f) * cosf(angle));
+            hexY[i] = (uint16_t)(buffer.Height / 2.0f + (buffer.Height / 3.0f) * sinf(angle));
+        }
+        PicoPixel::Graphics::DrawPolygon(&buffer, hexX, hexY, 6, PicoPixel::Utils::RGBto16bit(255, 128, 0), false);
+        // Pentagon filled
+        uint16_t pentX[5], pentY[5];
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = 2.0f * 3.1415926f * i / 5.0f - 3.1415926f/2.0f;
+            pentX[i] = (uint16_t)(buffer.Width / 2.0f + (buffer.Height / 4.0f) * cosf(angle));
+            pentY[i] = (uint16_t)(buffer.Height / 2.0f + (buffer.Height / 4.0f) * sinf(angle));
+        }
+        PicoPixel::Graphics::DrawPolygon(&buffer, pentX, pentY, 5, PicoPixel::Utils::RGBto16bit(0, 255, 128), true);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
+        sleep_ms(2000);
+
+        // DisplayTest pattern
+        PicoPixel::Graphics::DisplayTest(&buffer);
+        PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, &buffer);
         sleep_ms(3000);
         // PicoPixel::Driver::PixelTest(ili9341Data);
         // sleep_ms(1500);

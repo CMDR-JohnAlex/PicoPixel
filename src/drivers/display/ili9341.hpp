@@ -8,6 +8,7 @@ namespace PicoPixel
 {
     namespace Driver
     {
+        // TODO: Add (x, y) position
         struct Buffer
         {
             uint16_t Width;
@@ -54,8 +55,6 @@ namespace PicoPixel
 
         void DrawBuffer(Ili9341Data* display, uint16_t x, uint16_t y, Buffer* buffer);
         void DrawBuffer(Ili9341Data* display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* buffer);
-
-        void DisplayTest(Ili9341Data* display, Buffer* buffer);
 
         void EnsureSPI8Bit(Ili9341Data* display);
         void EnsureSPI16Bit(Ili9341Data* display);
