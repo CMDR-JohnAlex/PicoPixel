@@ -1,6 +1,8 @@
 #include "pong.hpp"
 #include "graphics/graphics.hpp"
 #include "utils/random.hpp"
+#include <hardware/gpio.h>
+#include <hardware/adc.h>
 #include <cstdio>
 #include <algorithm>
 #include <cmath>
@@ -35,6 +37,9 @@ namespace PicoPixel
             paddle1Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
             paddle2Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
             ResetBall();
+
+            adc_init();
+            adc_gpio_init(28);
         }
 
         void PongGame::OnShutdown()
@@ -60,13 +65,16 @@ namespace PicoPixel
             float target2 = ballY + ballSize / 2.0f - paddleHeight / 2.0f;
 
             // Left paddle AI: only move if ball is on left region
-            if (ballX + ballSize / 2.0f < fieldWidth / paddleAISplitRatio)
-            {
-                if (paddle1Y < target1)
-                    paddle1Y = std::min(paddle1Y + paddleSpeed * dt, target1);
-                else if (paddle1Y > target1)
-                    paddle1Y = std::max(paddle1Y - paddleSpeed * dt, target1);
-            }
+            // if (ballX + ballSize / 2.0f < fieldWidth / paddleAISplitRatio)
+            // {
+            //     if (paddle1Y < target1)
+            //         paddle1Y = std::min(paddle1Y + paddleSpeed * dt, target1);
+            //     else if (paddle1Y > target1)
+            //         paddle1Y = std::max(paddle1Y - paddleSpeed * dt, target1);
+            // }
+
+            adc_select_input(2);
+            paddle1Y = adc_read() / 15 + (paddleHeight / 2) - 30;
 
             // Right paddle AI: only move if ball is on right region
             if (ballX + ballSize / 2.0f >= fieldWidth - (fieldWidth / paddleAISplitRatio))
