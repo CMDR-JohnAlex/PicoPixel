@@ -13,19 +13,19 @@ namespace PicoPixel
         void ExampleGame::OnInit()
         {
             // Initialization logic here
-            printf("ExampleGame::OnInit()\n");
+            printf("[ExampleGame] ExampleGame::OnInit()\n");
         }
 
         void ExampleGame::OnShutdown()
         {
             // Cleanup logic here
-            printf("ExampleGame::OnShutdown()\n");
+            printf("[ExampleGame] ExampleGame::OnShutdown()\n");
         }
 
         bool ExampleGame::OnUpdate(float dt)
         {
             // Game update logic here
-            printf("ExampleGame::OnUpdate(%f)\n", dt);
+            printf("[ExampleGame] ExampleGame::OnUpdate(%f)\n", dt);
 
             sleep_ms(1000);
 
@@ -35,7 +35,7 @@ namespace PicoPixel
         void ExampleGame::OnRender()
         {
             // Rendering logic here
-            printf("ExampleGame::OnRender()\n");
+            printf("[ExampleGame] ExampleGame::OnRender()\n");
 
             PicoPixel::Graphics::FillBuffer(Buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
 

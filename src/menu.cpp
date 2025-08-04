@@ -18,7 +18,7 @@ namespace PicoPixel
         void LaunchMenu(PicoPixel::Driver::Ili9341Data* ili9341Data, PicoPixel::Driver::Buffer* buffer)
         {
             auto& factories = PicoPixel::Games::GameRegistry::GetFactories();
-            printf("Registered games: %zu\n", factories.size());
+            printf("[Menu] Registered games: %zu\n", factories.size());
             int selected = 0;
             bool exitMenu = false;
             bool exitGame = false;
@@ -34,13 +34,13 @@ namespace PicoPixel
                     for (size_t i = 0; i < factories.size(); i++)
                     {
                         PicoPixel::Games::Game* temp = factories[i](buffer);
-                        printf("%s - %s\n", temp->GetName().c_str(), temp->GetDescription().c_str());
+                        printf("[Menu] %s - %s\n", temp->GetName().c_str(), temp->GetDescription().c_str());
                         delete temp;
                     }
                     // FIXME: TEMP! Need to be able to select options.
                     {
                         sleep_ms(5000);
-                        printf("Auto-selecting first option\n");
+                        printf("[Menu] Auto-selecting first option\n");
                         currentGame = factories[0](buffer);
                         state = MenuState::Game;
                     }
