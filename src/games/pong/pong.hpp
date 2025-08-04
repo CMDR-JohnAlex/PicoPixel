@@ -1,5 +1,6 @@
 #pragma once
 
+#include "drivers/potentiometer/b10k.hpp"
 #include "games/game.hpp"
 #include <string>
 
@@ -38,6 +39,8 @@ namespace PicoPixel
             uint16_t centerLineDashSpacing;
             uint16_t centerLineDashWidth;
             uint16_t centerLineDashHeight;
+            // Input
+            B10kDriver::B10kData* paddle1Potentiometer;
         };
     }
 }

@@ -1,4 +1,5 @@
 #include "pong.hpp"
+
 #include "graphics/graphics.hpp"
 #include "utils/random.hpp"
 #include <hardware/gpio.h>
@@ -38,12 +39,14 @@ namespace PicoPixel
             paddle2Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
             ResetBall();
 
-            adc_init();
-            adc_gpio_init(28);
+            paddle1Potentiometer = new B10kDriver::B10kData();
+            // TODO: Remove magic numbers 28 & 2. Maybe. Doesn't really matter.
+            B10kDriver::InitializeB10k(paddle1Potentiometer, 28, 2);
         }
 
         void PongGame::OnShutdown()
         {
+            delete(paddle1Potentiometer);
         }
 
         void PongGame::ResetBall()
@@ -73,8 +76,7 @@ namespace PicoPixel
             //         paddle1Y = std::max(paddle1Y - paddleSpeed * dt, target1);
             // }
 
-            adc_select_input(2);
-            paddle1Y = adc_read() / 15;
+            paddle1Y = B10kDriver::ReadB10k(paddle1Potentiometer) / 15;
 
             // Right paddle AI: only move if ball is on right region
             if (ballX + ballSize / 2.0f >= fieldWidth - (fieldWidth / paddleAISplitRatio))
