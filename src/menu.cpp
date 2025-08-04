@@ -40,8 +40,8 @@ namespace PicoPixel
                     // FIXME: TEMP! Need to be able to select options.
                     {
                         sleep_ms(5000);
-                        printf("[Menu] Auto-selecting first option\n");
-                        currentGame = factories[0](buffer);
+                        printf("[Menu] Auto-selecting option 2\n");
+                        currentGame = factories[1](buffer);
                         state = MenuState::Game;
                     }
                     break;

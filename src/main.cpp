@@ -15,6 +15,7 @@
 #include <cmath>
 
 #include "games/template/exampleGame.hpp"
+#include "games/pong/pong.hpp"
 
 void FlashGPIOLEDPin(bool longFlash)
 {
@@ -191,6 +192,7 @@ int main()
     // ------- Begin Game Registration -------
 
     REGISTER_GAME(ExampleGame);
+    REGISTER_GAME(PongGame);
 
     // ------- End Game Registration -------
 

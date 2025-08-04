@@ -42,7 +42,7 @@ add_executable(PicoPixel
     src/main.cpp
     src/drivers/display/ili9341.cpp
     src/menu.cpp
-    #src/games/pong.cpp
+    src/games/pong/pong.cpp
     src/games/template/exampleGame.cpp
     src/games/game.cpp
     src/games/gameRegistry.cpp
