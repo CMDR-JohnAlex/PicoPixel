@@ -74,7 +74,7 @@ namespace PicoPixel
             // }
 
             adc_select_input(2);
-            paddle1Y = adc_read() / 15 + (paddleHeight / 2) - 30;
+            paddle1Y = adc_read() / 15;
 
             // Right paddle AI: only move if ball is on right region
             if (ballX + ballSize / 2.0f >= fieldWidth - (fieldWidth / paddleAISplitRatio))
