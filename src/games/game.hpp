@@ -18,7 +18,7 @@ namespace PicoPixel
 
             virtual void OnInit() = 0;
             virtual void OnShutdown() = 0;
-            virtual void OnUpdate(float dt) = 0;
+            virtual bool OnUpdate(float dt) = 0;
             virtual void OnRender() = 0;
 
             // For menu

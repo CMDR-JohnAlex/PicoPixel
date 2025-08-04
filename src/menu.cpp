@@ -21,7 +21,7 @@ namespace PicoPixel
             printf("Registered games: %zu\n", factories.size());
             int selected = 0;
             bool exitMenu = false;
-            bool gameRunning = false;
+            bool exitGame = false;
             enum class MenuState { Menu, Game };
             MenuState state = MenuState::Menu;
             PicoPixel::Games::Game* currentGame = nullptr;
@@ -47,15 +47,15 @@ namespace PicoPixel
                     break;
 
                 case MenuState::Game:
-                    gameRunning = true; // TODO: Game.OnUpdate() should return a bool to change this.
+                    exitGame = false;
                     currentGame->OnInit();
                     uint64_t lastTime = time_us_64();
-                    while (gameRunning)
+                    while (!exitGame)
                     {
                         uint64_t now = time_us_64();
                         float dt = (now - lastTime) / 1e6f;
                         lastTime = now;
-                        currentGame->OnUpdate(dt);
+                        exitGame = currentGame->OnUpdate(dt);
                         currentGame->OnRender();
                         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, buffer);
                     }

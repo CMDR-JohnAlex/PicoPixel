@@ -16,7 +16,7 @@ namespace PicoPixel
 
             void OnInit() override;
             void OnShutdown() override;
-            void OnUpdate(float dt) override;
+            bool OnUpdate(float dt) override;
             void OnRender() override;
 
             std::string GetName() override;

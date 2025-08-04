@@ -22,12 +22,14 @@ namespace PicoPixel
             printf("ExampleGame::OnShutdown()\n");
         }
 
-        void ExampleGame::OnUpdate(float dt)
+        bool ExampleGame::OnUpdate(float dt)
         {
             // Game update logic here
             printf("ExampleGame::OnUpdate(%f)\n", dt);
 
             sleep_ms(1000);
+
+            return false; // We do not want to quit.
         }
 
         void ExampleGame::OnRender()
