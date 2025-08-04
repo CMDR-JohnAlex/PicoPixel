@@ -1,6 +1,7 @@
 #pragma once
 
 #include "drivers/display/ili9341.hpp"
+#include "utils/color.hpp"
 #include <cstdint>
 
 namespace PicoPixel

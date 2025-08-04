@@ -41,9 +41,13 @@ endif()
 add_executable(PicoPixel
     src/main.cpp
     src/drivers/display/ili9341.cpp
-    src/firmware/boot.cpp
-    src/firmware/menu.cpp
+    src/menu.cpp
+    #src/games/pong.cpp
+    src/games/template/exampleGame.cpp
+    src/games/game.cpp
+    src/games/gameRegistry.cpp
     src/graphics/graphics.cpp
+    src/graphics/text.cpp
     src/utils/color.cpp
     src/utils/random.cpp
 )
@@ -69,7 +73,7 @@ target_include_directories(PicoPixel PRIVATE
 add_subdirectory(lib)
 
 # pico-vfs filesystem
-pico_enable_filesystem(${CMAKE_PROJECT_NAME} FS_INIT src/firmware/fs_init.c)
+pico_enable_filesystem(${CMAKE_PROJECT_NAME} FS_INIT src/fs_init.c)
 
 # Add any user requested libraries
 target_link_libraries(PicoPixel
