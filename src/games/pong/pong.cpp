@@ -76,6 +76,7 @@ namespace PicoPixel
             //         paddle1Y = std::max(paddle1Y - paddleSpeed * dt, target1);
             // }
 
+            // TODO: Remove magic number 15.
             paddle1Y = B10kDriver::ReadB10k(paddle1Potentiometer) / 15;
 
             // Right paddle AI: only move if ball is on right region
