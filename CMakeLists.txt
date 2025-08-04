@@ -41,6 +41,7 @@ endif()
 add_executable(PicoPixel
     src/main.cpp
     src/drivers/display/ili9341.cpp
+    src/drivers/potentiometer/b10k.cpp
     src/menu.cpp
     src/games/pong/pong.cpp
     src/games/template/exampleGame.cpp

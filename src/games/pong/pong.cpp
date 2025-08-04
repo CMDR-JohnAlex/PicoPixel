@@ -1,6 +1,9 @@
 #include "pong.hpp"
+
 #include "graphics/graphics.hpp"
 #include "utils/random.hpp"
+#include <hardware/gpio.h>
+#include <hardware/adc.h>
 #include <cstdio>
 #include <algorithm>
 #include <cmath>
@@ -35,10 +38,15 @@ namespace PicoPixel
             paddle1Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
             paddle2Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
             ResetBall();
+
+            paddle1Potentiometer = new B10kDriver::B10kData();
+            // TODO: Remove magic numbers 28 & 2. Maybe. Doesn't really matter.
+            B10kDriver::InitializeB10k(paddle1Potentiometer, 28, 2);
         }
 
         void PongGame::OnShutdown()
         {
+            delete(paddle1Potentiometer);
         }
 
         void PongGame::ResetBall()
@@ -60,13 +68,16 @@ namespace PicoPixel
             float target2 = ballY + ballSize / 2.0f - paddleHeight / 2.0f;
 
             // Left paddle AI: only move if ball is on left region
-            if (ballX + ballSize / 2.0f < fieldWidth / paddleAISplitRatio)
-            {
-                if (paddle1Y < target1)
-                    paddle1Y = std::min(paddle1Y + paddleSpeed * dt, target1);
-                else if (paddle1Y > target1)
-                    paddle1Y = std::max(paddle1Y - paddleSpeed * dt, target1);
-            }
+            // if (ballX + ballSize / 2.0f < fieldWidth / paddleAISplitRatio)
+            // {
+            //     if (paddle1Y < target1)
+            //         paddle1Y = std::min(paddle1Y + paddleSpeed * dt, target1);
+            //     else if (paddle1Y > target1)
+            //         paddle1Y = std::max(paddle1Y - paddleSpeed * dt, target1);
+            // }
+
+            // TODO: Remove magic number 15.
+            paddle1Y = B10kDriver::ReadB10k(paddle1Potentiometer) / 15;
 
             // Right paddle AI: only move if ball is on right region
             if (ballX + ballSize / 2.0f >= fieldWidth - (fieldWidth / paddleAISplitRatio))
