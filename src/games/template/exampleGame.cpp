@@ -25,7 +25,7 @@ namespace PicoPixel
         void ExampleGame::OnUpdate(float dt)
         {
             // Game update logic here
-            printf("ExampleGame::OnUpdate(dt)\n");
+            printf("ExampleGame::OnUpdate(%f)\n", dt);
 
             sleep_ms(1000);
         }
@@ -39,8 +39,8 @@ namespace PicoPixel
 
             uint16_t maxWidth = Buffer->Width;
             uint16_t maxHeight = Buffer->Height;
-            uint16_t rectWidth = (rand() % (maxWidth / 4)) + 20;    // 20 to 25% of screen width
-            uint16_t rectHeight = (rand() % (maxHeight / 4)) + 20;  // 20 to 25% of screen height
+            uint16_t rectWidth = (rand() % (maxWidth / 2)) + 20;    // 20 to 1/2 of screen width
+            uint16_t rectHeight = (rand() % (maxHeight / 2)) + 20;  // 20 to 1/2 of screen height
             uint16_t rectX = rand() % (maxWidth - rectWidth);       // Ensure rect fits horizontally
             uint16_t rectY = rand() % (maxHeight - rectHeight);     // Ensure rect fits vertically
 

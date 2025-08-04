@@ -32,7 +32,7 @@ project(PicoPixel C CXX ASM)
 pico_sdk_init()
 
 # Options
-set(STARTUP_DELAY_MS "3000" CACHE STRING "Startup delay for serial monitor attachment (milliseconds). Set to 0 to disable.")
+set(STARTUP_DELAY_MS "7000" CACHE STRING "Startup delay for serial monitor attachment (milliseconds). Set to 0 to disable.")
 
 if(STARTUP_DELAY_MS GREATER 0)
     add_compile_definitions(STARTUP_DELAY_MS=${STARTUP_DELAY_MS})

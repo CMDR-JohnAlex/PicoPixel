@@ -6,18 +6,27 @@ namespace PicoPixel
 {
     namespace Menu
     {
+        /*
+        TODO:
+          - Clean this code file up
+          - Visible menu with navigate-able list of games
+          - Input for menu (either temp input over serial connection messages, or physical GPIO keys)
+          - Either a dedicated button for menu to stop game, or dedicated quit button for game to implement a close dialogue..?
+          - Power on/off menu button that would turn off the display and wait to wake up
+        */
+
         void LaunchMenu(PicoPixel::Driver::Ili9341Data* ili9341Data, PicoPixel::Driver::Buffer* buffer)
         {
             auto& factories = PicoPixel::Games::GameRegistry::GetFactories();
             printf("Registered games: %zu\n", factories.size());
             int selected = 0;
-            bool shouldExit = false;
+            bool exitMenu = false;
             bool gameRunning = false;
             enum class MenuState { Menu, Game };
             MenuState state = MenuState::Menu;
             PicoPixel::Games::Game* currentGame = nullptr;
 
-            while (!shouldExit)
+            while (!exitMenu)
             {
                 switch (state)
                 {
@@ -30,8 +39,8 @@ namespace PicoPixel
                     }
                     // FIXME: TEMP! Need to be able to select options.
                     {
-                        sleep_ms(15000);
-                        printf("Auto-selecting first option");
+                        sleep_ms(5000);
+                        printf("Auto-selecting first option\n");
                         currentGame = factories[0](buffer);
                         state = MenuState::Game;
                     }
@@ -40,9 +49,13 @@ namespace PicoPixel
                 case MenuState::Game:
                     gameRunning = true; // TODO: Game.OnUpdate() should return a bool to change this.
                     currentGame->OnInit();
+                    uint64_t lastTime = time_us_64();
                     while (gameRunning)
                     {
-                        currentGame->OnUpdate(0.0f); // Proper deltatime calculation.
+                        uint64_t now = time_us_64();
+                        float dt = (now - lastTime) / 1e6f;
+                        lastTime = now;
+                        currentGame->OnUpdate(dt);
                         currentGame->OnRender();
                         PicoPixel::Driver::DrawBuffer(ili9341Data, 0, 0, buffer);
                     }
