@@ -14,8 +14,12 @@ namespace PicoPixel
         PongGame::PongGame(PicoPixel::Driver::Buffer* buffer)
             : Game(buffer)
         {
-            fieldWidth = buffer->Width;
-            fieldHeight = buffer->Height;
+        }
+
+        void PongGame::OnInit()
+        {
+            fieldWidth = Buffer->Width;
+            fieldHeight = Buffer->Height;
             paddleHeight = fieldHeight / 5.0f;
             paddleWidth = 6;
             paddleSpeed = 130.0f;       // Paddle speed (pixels/sec)
@@ -27,10 +31,7 @@ namespace PicoPixel
             centerLineDashSpacing = 8;
             centerLineDashWidth = 2;
             centerLineDashHeight = 4;
-        }
 
-        void PongGame::OnInit()
-        {
             // Reset paddles and ball to center
             paddle1Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
             paddle2Y = fieldHeight / 2.0f - paddleHeight / 2.0f;
@@ -61,7 +62,7 @@ namespace PicoPixel
         {
             // Calculate where paddles should move to intercept ball
             // TODO: Could make this smarter. Intercept where it *will* be.
-            float target1 = ballY + ballSize / 2.0f - paddleHeight / 2.0f;
+            //float target1 = ballY + ballSize / 2.0f - paddleHeight / 2.0f;
             float target2 = ballY + ballSize / 2.0f - paddleHeight / 2.0f;
 
             // Left paddle AI: only move if ball is on left region
