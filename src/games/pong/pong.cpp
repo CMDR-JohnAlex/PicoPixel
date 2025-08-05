@@ -4,7 +4,6 @@
 #include "utils/random.hpp"
 #include <hardware/gpio.h>
 #include <hardware/adc.h>
-#include <cstdio>
 #include <algorithm>
 #include <cmath>
 
@@ -28,8 +27,6 @@ namespace PicoPixel
             centerLineDashSpacing = 8;
             centerLineDashWidth = 2;
             centerLineDashHeight = 4;
-
-            OnInit();
         }
 
         void PongGame::OnInit()

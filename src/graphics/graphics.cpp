@@ -2,6 +2,7 @@
 #include "utils/color.hpp"
 #include <cstdlib>
 #include <algorithm>
+#include "log.hpp"
 
 namespace PicoPixel
 {
@@ -9,17 +10,38 @@ namespace PicoPixel
     {
         void DrawPixel(PicoPixel::Driver::Buffer* buffer, uint16_t x, uint16_t y, uint16_t color)
         {
-            if (!buffer || !buffer->Data) return;
-            if (x >= buffer->Width || y >= buffer->Height) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (x >= buffer->Width || y >= buffer->Height)
+            {
+                LOG("Out of bounds (%u,%u)", x, y);
+                return;
+            }
+
             uint32_t idx = y * buffer->Width + x;
             buffer->Data[idx] = color;
         }
 
         void DrawLine(PicoPixel::Driver::Buffer* buffer, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
         {
-            if (!buffer || !buffer->Data) return;
-            if (x1 >= buffer->Width || y1 >= buffer->Height) return;
-            if (x2 >= buffer->Width || y2 >= buffer->Height) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (x1 >= buffer->Width || y1 >= buffer->Height)
+            {
+                LOG("Start out of bounds (%u,%u)", x1, y1);
+                return;
+            }
+            if (x2 >= buffer->Width || y2 >= buffer->Height)
+            {
+                LOG("End out of bounds (%u,%u)", x2, y2);
+                return;
+            }
 
             // Bresenham's line algorithm
             // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
@@ -42,10 +64,26 @@ namespace PicoPixel
 
         void DrawTriangle(PicoPixel::Driver::Buffer* buffer, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color, bool filled)
         {
-            if (!buffer || !buffer->Data) return;
-            if (x1 >= buffer->Width || y1 >= buffer->Height) return;
-            if (x2 >= buffer->Width || y2 >= buffer->Height) return;
-            if (x3 >= buffer->Width || y3 >= buffer->Height) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (x1 >= buffer->Width || y1 >= buffer->Height)
+            {
+                LOG("Vertex1 out of bounds (%u,%u)", x1, y1);
+                return;
+            }
+            if (x2 >= buffer->Width || y2 >= buffer->Height)
+            {
+                LOG("Vertex2 out of bounds (%u,%u)", x2, y2);
+                return;
+            }
+            if (x3 >= buffer->Width || y3 >= buffer->Height)
+            {
+                LOG("Vertex3 out of bounds (%u,%u)", x3, y3);
+                return;
+            }
 
             if (!filled)
             {
@@ -90,10 +128,26 @@ namespace PicoPixel
 
         void DrawRectangle(PicoPixel::Driver::Buffer* buffer, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, bool filled)
         {
-            if (!buffer || !buffer->Data) return;
-            if (x >= buffer->Width || y >= buffer->Height) return;
-            if (width == 0 || height == 0) return;
-            if (x + width > buffer->Width || y + height > buffer->Height) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (x >= buffer->Width || y >= buffer->Height)
+            {
+                LOG("Start out of bounds (%u,%u)", x, y);
+                return;
+            }
+            if (width == 0 || height == 0)
+            {
+                LOG("Zero width or height");
+                return;
+            }
+            if (x + width > buffer->Width || y + height > buffer->Height)
+            {
+                LOG("Rectangle out of bounds (%u,%u,%u,%u)", x, y, width, height);
+                return;
+            }
 
             if (!filled)
             {
@@ -111,9 +165,21 @@ namespace PicoPixel
 
         void DrawCircle(PicoPixel::Driver::Buffer* buffer, uint16_t centerX, uint16_t centerY, uint16_t radius, uint16_t color, bool filled)
         {
-            if (!buffer || !buffer->Data) return;
-            if (centerX >= buffer->Width || centerY >= buffer->Height) return;
-            if (radius == 0) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (centerX >= buffer->Width || centerY >= buffer->Height)
+            {
+                LOG("Center out of bounds (%u,%u)", centerX, centerY);
+                return;
+            }
+            if (radius == 0)
+            {
+                LOG("Zero radius");
+                return;
+            }
 
             // Midpoint circle algorithm
             // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
@@ -162,12 +228,28 @@ namespace PicoPixel
 
         void DrawPolygon(PicoPixel::Driver::Buffer* buffer, const uint16_t* xPoints, const uint16_t* yPoints, uint16_t numPoints, uint16_t color, bool filled)
         {
-            if (!buffer || !buffer->Data) return;
-            if (!xPoints || !yPoints) return;
-            if (numPoints < 3) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (!xPoints || !yPoints)
+            {
+                LOG("Null points array");
+                return;
+            }
+            if (numPoints < 3)
+            {
+                LOG("Not enough points (%u)", numPoints);
+                return;
+            }
             for (uint16_t i = 0; i < numPoints; i++)
             {
-                if (xPoints[i] >= buffer->Width || yPoints[i] >= buffer->Height) return;
+                if (xPoints[i] >= buffer->Width || yPoints[i] >= buffer->Height)
+                {
+                    LOG("Point %u out of bounds (%u,%u)", i, xPoints[i], yPoints[i]);
+                    return;
+                }
             }
 
             if (!filled)
@@ -190,10 +272,31 @@ namespace PicoPixel
 
         void DrawBitmap(PicoPixel::Driver::Buffer* buffer, uint16_t x, uint16_t y, const uint16_t* bitmap, uint16_t width, uint16_t height)
         {
-            if (!buffer || !buffer->Data || !bitmap) return;
-            if (x >= buffer->Width || y >= buffer->Height) return;
-            if (width == 0 || height == 0) return;
-            if (x + width > buffer->Width || y + height > buffer->Height) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            if (!bitmap)
+            {
+                LOG("Bitmap is null");
+                return;
+            }
+            if (x >= buffer->Width || y >= buffer->Height)
+            {
+                LOG("Start out of bounds (%u,%u)", x, y);
+                return;
+            }
+            if (width == 0 || height == 0)
+            {
+                LOG("Zero width or height");
+                return;
+            }
+            if (x + width > buffer->Width || y + height > buffer->Height)
+            {
+                LOG("Bitmap out of bounds (%u,%u,%u,%u)", x, y, width, height);
+                return;
+            }
 
             // Copy bitmap data into buffer at (x, y)
             for (uint16_t row = 0; row < height; row++)
@@ -209,7 +312,12 @@ namespace PicoPixel
 
         void FillBuffer(PicoPixel::Driver::Buffer* buffer, uint16_t color)
         {
-            if (!buffer || !buffer->Data) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+
             for (uint32_t i = 0; i < buffer->Width * buffer->Height; i++)
             {
                 buffer->Data[i] = color;
@@ -218,7 +326,13 @@ namespace PicoPixel
 
         void DisplayTest(PicoPixel::Driver::Buffer* buffer)
         {
-            if (!buffer || !buffer->Data) return;
+            if (!buffer || !buffer->Data)
+            {
+                LOG("Buffer is null");
+                return;
+            }
+            LOG("DisplayTest started: buffer %p, size %ux%u", buffer, buffer->Width, buffer->Height);
+
             uint16_t width = buffer->Width;
             uint16_t height = buffer->Height;
 
@@ -264,6 +378,7 @@ namespace PicoPixel
                 uint16_t rgb565 = PicoPixel::Utils::RGBto16bit(r, g, b);
                 DrawLine(buffer, 50 + 3 * bar, y, 50 + 4 * bar - 1, y, rgb565);
             }
+            LOG("DisplayTest finished");
         }
     }
 }

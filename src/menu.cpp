@@ -1,4 +1,5 @@
 #include "menu.hpp"
+#include "log.hpp"
 #include "games/gameRegistry.hpp"
 #include "games/game.hpp"
 
@@ -18,7 +19,7 @@ namespace PicoPixel
         void LaunchMenu(PicoPixel::Driver::Ili9341Data* ili9341Data, PicoPixel::Driver::Buffer* buffer)
         {
             auto& factories = PicoPixel::Games::GameRegistry::GetFactories();
-            printf("[Menu] Registered games: %zu\n", factories.size());
+            LOG("Registered games: %zu\n", factories.size());
             int selected = 0;
             bool exitMenu = false;
             bool exitGame = false;
@@ -34,13 +35,13 @@ namespace PicoPixel
                     for (size_t i = 0; i < factories.size(); i++)
                     {
                         PicoPixel::Games::Game* temp = factories[i](buffer);
-                        printf("[Menu] %s - %s\n", temp->GetName().c_str(), temp->GetDescription().c_str());
+                        LOG("%s - %s\n", temp->GetName().c_str(), temp->GetDescription().c_str());
                         delete temp;
                     }
                     // FIXME: TEMP! Need to be able to select options.
                     {
                         sleep_ms(5000);
-                        printf("[Menu] Auto-selecting option 2\n");
+                        LOG("Auto-selecting option 2\n");
                         currentGame = factories[1](buffer);
                         state = MenuState::Game;
                     }

@@ -1,6 +1,6 @@
 #include "random.hpp"
 #include <cstdlib>
-#include <stdio.h>
+#include "log.hpp"
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
@@ -45,8 +45,8 @@ namespace PicoPixel
             seed ^= (uint32_t)clock_get_hz(clk_sys);
 
             srand(seed);
-            printf("[InitRand] Seed: %u\n", seed);
-            printf("[InitRand] First 10 random numbers: ");
+            LOG("Seed: %u\n", seed);
+            LOG("First 10 random numbers: ");
             for (int i = 0; i < 10; i++)
             {
                 printf("%u ", (unsigned)rand());

@@ -1,6 +1,6 @@
 #include "ili9341.hpp"
+#include "log.hpp"
 #include "hardware/pwm.h"
-#include <cstdio>
 #include <cstdlib>
 #include <array>
 
@@ -33,7 +33,7 @@ namespace PicoPixel
 
             spi_init(display->SpiPort, display->SpiClockFreqency);
             const int actualBaudrate = spi_set_baudrate(display->SpiPort, display->SpiClockFreqency);
-            printf("[ili9341] Requested: %d Hz, Actual: %d Hz\n", display->SpiClockFreqency, actualBaudrate);
+            LOG("Requested: %d Hz, Actual: %d Hz\n", display->SpiClockFreqency, actualBaudrate);
 
             EnsureSPI8Bit(display);
 
@@ -102,7 +102,7 @@ namespace PicoPixel
             uint16_t* newBuffer = (uint16_t*)malloc(bufferSize);
             if (!newBuffer)
             {
-                printf("[ili9341] Failed to allocate framebuffer!\n");
+                LOG("Failed to allocate framebuffer!\n");
             }
 
             buffer->Width = display->Width;

@@ -1,4 +1,5 @@
 #include "exampleGame.hpp"
+#include "log.hpp"
 #include <string>
 
 namespace PicoPixel
@@ -13,19 +14,19 @@ namespace PicoPixel
         void ExampleGame::OnInit()
         {
             // Initialization logic here
-            printf("[ExampleGame] ExampleGame::OnInit()\n");
+            LOG("OnInit()\n");
         }
 
         void ExampleGame::OnShutdown()
         {
             // Cleanup logic here
-            printf("[ExampleGame] ExampleGame::OnShutdown()\n");
+            LOG("OnShutdown()\n");
         }
 
         bool ExampleGame::OnUpdate(float dt)
         {
             // Game update logic here
-            printf("[ExampleGame] ExampleGame::OnUpdate(%f)\n", dt);
+            LOG("OnUpdate(%f)\n", dt);
 
             sleep_ms(1000);
 
@@ -35,7 +36,7 @@ namespace PicoPixel
         void ExampleGame::OnRender()
         {
             // Rendering logic here
-            printf("[ExampleGame] ExampleGame::OnRender()\n");
+            LOG("OnRender()\n");
 
             PicoPixel::Graphics::FillBuffer(Buffer, PicoPixel::Utils::RGBto16bit(0, 0, 0));
 

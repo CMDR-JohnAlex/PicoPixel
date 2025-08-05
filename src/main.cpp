@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <cstdlib>
 #include <pico/stdlib.h> // Required
 #include <pico/cyw43_arch.h> // Onboard LED
@@ -13,6 +12,7 @@
 #include "utils/color.hpp"
 #include "utils/random.hpp"
 #include <cmath>
+#include <log.hpp>
 
 #include "games/template/exampleGame.hpp"
 #include "games/pong/pong.hpp"
@@ -125,7 +125,7 @@ bool RunDiagnostics(PicoPixel::Driver::Ili9341Data* ili9341Data, PicoPixel::Driv
 int main()
 {
     stdio_init_all();
-    printf("Hello, World!");
+    LOG("Hello, World!");
 
     PicoPixel::Driver::Ili9341Data* ili9341Data = new PicoPixel::Driver::Ili9341Data();
     PicoPixel::Driver::InitializeIli9341(ili9341Data,
@@ -175,15 +175,15 @@ int main()
 
     // ------- Begin initialization -------
 
-    printf("System Clock Frequency is %d Hz\n", clock_get_hz(clk_sys));
-    printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
+    LOG("System Clock Frequency is %d Hz\n", clock_get_hz(clk_sys));
+    LOG("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
 
     // TODO: Watchdog recovery stuff here
     // TODO: Silly progress bar or idle animation for loading
 
     if (cyw43_arch_init())
     {
-        printf("cyw43_arch_init failed! (Required to access the onboard LED)\n");
+        LOG("cyw43_arch_init failed! (Required to access the onboard LED)\n");
         return false;
     }
 
