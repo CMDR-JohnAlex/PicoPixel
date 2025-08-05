@@ -201,7 +201,7 @@ namespace PicoPixel
 
         std::string PongGame::GetDescription()
         {
-            return "Classic Pong: AI vs AI";
+            return "Classic Pong: Player vs AI";
         }
     }
 }
