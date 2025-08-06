@@ -32,7 +32,7 @@ project(PicoPixel C CXX ASM)
 pico_sdk_init()
 
 # Options
-set(STARTUP_DELAY_MS "7000" CACHE STRING "Startup delay for serial monitor attachment (milliseconds). Set to 0 to disable.")
+set(STARTUP_DELAY_MS "0000" CACHE STRING "Startup delay for serial monitor attachment (milliseconds). Set to 0 to disable.")
 
 if(STARTUP_DELAY_MS GREATER 0)
     add_compile_definitions(STARTUP_DELAY_MS=${STARTUP_DELAY_MS})
@@ -43,6 +43,7 @@ add_executable(PicoPixel
     src/drivers/display/ili9341.cpp
     src/drivers/potentiometer/b10k.cpp
     src/menu.cpp
+    src/games/PicoSpace/PicoSpace.cpp
     src/games/pong/pong.cpp
     src/games/template/exampleGame.cpp
     src/games/game.cpp

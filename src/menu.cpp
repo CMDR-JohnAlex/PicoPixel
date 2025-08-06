@@ -40,9 +40,9 @@ namespace PicoPixel
                     }
                     // FIXME: TEMP! Need to be able to select options.
                     {
-                        sleep_ms(5000);
-                        LOG("Auto-selecting option 2\n");
-                        currentGame = factories[1](buffer);
+                        sleep_ms(3000);
+                        LOG("Auto-selecting option 3\n");
+                        currentGame = factories[2](buffer);
                         state = MenuState::Game;
                     }
                     break;

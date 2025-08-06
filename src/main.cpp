@@ -14,6 +14,7 @@
 #include <cmath>
 #include <log.hpp>
 
+#include "games/PicoSpace/PicoSpace.hpp"
 #include "games/template/exampleGame.hpp"
 #include "games/pong/pong.hpp"
 
@@ -193,10 +194,11 @@ int main()
 
     REGISTER_GAME(ExampleGame);
     REGISTER_GAME(PongGame);
+    REGISTER_GAME(PicoSpace);
 
     // ------- End Game Registration -------
 
-    sleep_ms(1500);
+    //sleep_ms(1000);
 
     // ------- End of initialization -------
 
