@@ -36,6 +36,8 @@ namespace PicoPixel
 
             bool Project3DTo2D(const Utils::Vec3& point3D, uint16_t& x, uint16_t& y);
 
+            void PrintMemoryUsage();
+
         private:
             const uint8_t CROSSHAIR_SIZE = 16;
 

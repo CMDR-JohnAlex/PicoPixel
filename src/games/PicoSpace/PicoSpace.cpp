@@ -2,6 +2,9 @@
 #include "log.hpp"
 #include "utils/random.hpp"
 
+#include "pico/stdlib.h"
+#include <malloc.h>
+
 namespace PicoPixel
 {
     namespace Games
@@ -93,7 +96,7 @@ namespace PicoPixel
             // This will be done by calculating a random distance, rotation, and elevation.
             // (I believe there are special names for these three things but I don't know them...)
             const float NearestParticle = 10.0f;
-            const float FarthestParticle = 500.0f;
+            const float FarthestParticle = 1000.0f;
 
             float distance = NearestParticle + (Utils::Rand() % (uint16_t)(FarthestParticle - NearestParticle));
             float rotation = (Utils::Rand() % (2 * 314)) / 100.0f; // Between 0 and 2*PI (full circle)
@@ -115,10 +118,15 @@ namespace PicoPixel
         {
             for (uint8_t i = 0; i < MAX_PARTICLES; i++)
             {
-                // TODO:
-                //    - Redistribute out-of-range particles
                 // FIXME: Temp movement
-                Particles[i].Position.z += 10.0f;
+                Particles[i].Position.z -= 5.0f;
+
+                // Redistribute out-of-range particles.
+                const float FarthestParticle = 1000.0f;
+                if (Particles[i].Position > FarthestParticle)
+                {
+                    DistributeParticle(&Particles[i]);
+                }
             }
         }
 
@@ -142,6 +150,7 @@ namespace PicoPixel
             if (frameCount % (60 * 5) == 0)
             {
                 LOG("PicoSpace: Rendered %d/%d visible particles\n", visibleCount, MAX_PARTICLES);
+                PrintMemoryUsage();
             }
             frameCount++;
         }
@@ -149,7 +158,6 @@ namespace PicoPixel
         bool PicoSpace::Project3DTo2D(const Utils::Vec3 &point3D, uint16_t& x, uint16_t& y)
         {
             // Convert 3D coordinates to 2D screen coordinates
-            // (Simple perspective projection)
 
             // If point is too close, mark it as off-screen
             if (point3D.z < NEAR_PLANE)
@@ -168,8 +176,12 @@ namespace PicoPixel
             // once and multiply worldX and worldY with that since division is slow.
             // (worldX / worldZ) == (worldX * (1 / worldZ))
 
+            // We'll also correct for aspect ratio by scaling X by the same factor as Y.
+            // The focal length is (Buffer->Height / 2.0f) and X is multiplied by the aspect ratio (width / height).
+
+            float aspect = (float)Buffer->Width / (float)Buffer->Height;
             float inverseZ = 1.0f / point3D.z;
-            float screenX = (point3D.x * inverseZ) * (Buffer->Width / 2.0f) + Buffer->Width / 2.0f;
+            float screenX = (point3D.x * inverseZ) * (Buffer->Height / 2.0f) * aspect + Buffer->Width / 2.0f;
             float screenY = (point3D.y * inverseZ) * (Buffer->Height / 2.0f) + Buffer->Height / 2.0f;
 
             // Check that the projected coordinates are actually on screen.
@@ -179,6 +191,20 @@ namespace PicoPixel
             x = (uint16_t)screenX;
             y = (uint16_t)screenY;
             return true;
+        }
+
+        void PicoSpace::PrintMemoryUsage()
+        {
+            struct mallinfo mi = mallinfo();
+            LOG("Heap total: %d bytes\n", mi.arena);
+            LOG("Heap used: %d bytes\n", mi.uordblks);
+            LOG("Heap free: %d bytes\n", mi.fordblks);
+            LOG("Vec3 size: %d bytes\n", sizeof(Utils::Vec3));
+            LOG("Particle size: %d bytes\n", sizeof(Particle));
+            LOG("Particles[] size: %d bytes\n", (int)(MAX_PARTICLES * sizeof(Particle)));
+            LOG("Buffer struct size: %d bytes\n", (int)sizeof(Driver::Buffer));
+            if (Buffer && Buffer->Data)
+                LOG("Buffer pixel data size: %d bytes\n", (int)(Buffer->Width * Buffer->Height * sizeof(uint16_t)));
         }
     }
 }

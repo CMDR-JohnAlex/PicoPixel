@@ -36,6 +36,39 @@ namespace PicoPixel
             {
                 return Vec3(x * scalar, y * scalar, z * scalar);
             }
+            bool operator>(const Vec3& other) const
+            {
+                float a = sqrt((x * x) + (y * y) + (z * z));
+                float b = sqrt((other.x * other.x) + (other.y * other.y) + (other.z * other.z));
+                return a > b;
+            }
+            bool operator<(const Vec3& other) const
+            {
+                float a = sqrt((x * x) + (y * y) + (z * z));
+                float b = sqrt((other.x * other.x) + (other.y * other.y) + (other.z * other.z));
+                return a < b;
+            }
+            bool operator==(const Vec3& other) const
+            {
+                float a = sqrt((x * x) + (y * y) + (z * z));
+                float b = sqrt((other.x * other.x) + (other.y * other.y) + (other.z * other.z));
+                return a == b;
+            }
+            bool operator>(float scalar) const
+            {
+                float a = sqrt((x * x) + (y * y) + (z * z));
+                return a > scalar;
+            }
+            bool operator<(float scalar) const
+            {
+                float a = sqrt((x * x) + (y * y) + (z * z));
+                return a < scalar;
+            }
+            bool operator==(float scalar) const
+            {
+                float a = sqrt((x * x) + (y * y) + (z * z));
+                return a == scalar;
+            }
         };
 
         struct Mat3
