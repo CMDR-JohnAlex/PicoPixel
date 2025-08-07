@@ -21,6 +21,9 @@ namespace PicoPixel
             Particles = new Particle[MAX_PARTICLES];
             LOG("PicoSpace: Allocated %d particles on heap\n", MAX_PARTICLES);
 
+            Potentiometer = new B10kDriver::B10kData();
+            B10kDriver::InitializeB10k(Potentiometer, 28, 2);
+
             InitializeParticles();
         }
 
@@ -28,8 +31,11 @@ namespace PicoPixel
         {
             LOG("PicoSpace: Shutting down game\n");
 
+
             delete[] Particles;
             LOG("PicoSpace: Particle array deallocated\n");
+
+            delete Potentiometer;
 
             LOG("PicoSpace: Goodbye\n");
         }
@@ -116,10 +122,18 @@ namespace PicoPixel
 
         void PicoSpace::UpdateParticles(float dt)
         {
+            // FIXME: TEMPORARY INPUT!!
+            // Potentiometer mapping
+            static float potMin = 64.0f;   // Minimum mapped value (max backward)
+            static float potMax = 512.0f;   // Maximum mapped value (max forward)
+            static float potStop = 128.0f;  // Center/stop value
+
+            int raw = B10kDriver::ReadB10k(Potentiometer);
+            float pot = potMin + ((float)raw / 4095.0f) * (potMax - potMin);
+            float speed = pot - potStop;
             for (uint8_t i = 0; i < MAX_PARTICLES; i++)
             {
-                // FIXME: Temp movement
-                Particles[i].Position.z -= 5.0f;
+                Particles[i].Position.z += -speed * dt;
 
                 // Redistribute out-of-range particles.
                 const float FarthestParticle = 1000.0f;

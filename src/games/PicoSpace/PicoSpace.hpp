@@ -50,7 +50,7 @@ namespace PicoPixel
             Particle* Particles;
 
             // Input
-            B10kDriver::B10kData* paddle1Potentiometer;
+            B10kDriver::B10kData* Potentiometer;
         };
     }
 }
